@@ -1,0 +1,20 @@
+<!--
+- ossec config:
+<localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/mysql/mysql_general.log</location>
+</localfile>
+
+-->
+
+<!--
+- Examples audit log:
+230904 15:53:42	   39 Query	DROP DATABASE test_preview
+		   18 Connect	Access denied for user 'backup'@'198.18.2.1' (using password: YES)
+-->
+
+<decoder name="custom_mysql_audit">
+   <prematch>Query\t\w</prematch>
+   <regex>\s(\w+)\t(\.*)$</regex>
+   <order>_action, command</order>
+</decoder>

@@ -1,0 +1,32 @@
+<!--
+- ossec config:
+	<localfile>
+		<log_format>syslog</log_format>
+		<location>/var/log/postgresql/postgresql-14-main.log</location>
+	</localfile>
+-->
+
+<!--
+- Examples syslog:
+2023-09-05 11:33:15.599 CEST [293925] postgres@test_wazuh LOG:  AUDIT: SESSION,3,1,WRITE,INSERT,,,"INSERT INTO data (id, name) values (3, 'Jegor');",<not logged>
+2023-09-05 11:45:11.881 CEST [293925] postgres@test_wazuh LOG:  AUDIT: SESSION,4,1,DDL,DROP DATABASE,,,DROP database wazuh_test;,<not logged>
+2023-09-05 11:45:47.834 CEST [293925] postgres@test_wazuh LOG:  AUDIT: SESSION,5,1,DDL,CREATE DATABASE,,,CREATE DATABASE wazuh_test;,<not logged>
+-->
+
+<decoder name="custom_postgresql_audit">
+   <prematch>LOG:\s+AUDIT:\s</prematch>
+   <regex>\d,\D+,(\.*),,,(\.*;)</regex>
+   <order>_action, command</order>
+</decoder>
+
+<!--
+- Debian postgresl 14
+- Examples syslog:
+2023-09-05 14:01:00.661 CEST [307341] root@root FATAL:  password authentication failed for user "root"
+-->
+
+<decoder name="custom_postgresql_log">
+  <prematch>^\d\d\d\d-\d\d-\d\d \S+ \w+ [\d+] </prematch>
+  <regex offset="after_prematch">^\S+ (\w+): </regex>
+  <order>status</order>
+</decoder>
